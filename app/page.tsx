@@ -1,3 +1,4 @@
+import Link from "next/link"; // <--- Import nécessaire pour la navigation
 import FilterBar from "@/components/FilterBar";
 import KpiCard from "@/components/KpiCard";
 import { TopTenantsChart, ExpiryExposureChart } from "@/components/Charts";
@@ -6,7 +7,7 @@ import { parseFilters } from "@/lib/filters";
 import { 
   Building2, Wallet, Scale, AlertCircle, 
   TrendingUp, CalendarClock, MapPin, ArrowRight, 
-  Maximize2, Percent
+  Maximize2, Percent, LayoutDashboard, FileText
 } from "lucide-react";
 
 // --- Helpers de formatage ---
@@ -87,7 +88,6 @@ export default async function Page({
   };
   
   // --- Parsing Options (Sécurisé) ---
-  // Gère le cas où RPC renvoie un tableau d'objets ou l'objet directement
   let rawOpts: any = {};
   if (Array.isArray(optionsJson) && optionsJson.length > 0) {
     rawOpts = optionsJson[0];
@@ -121,17 +121,37 @@ export default async function Page({
 
       <main className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
-        <div className="mb-8 mt-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        {/* Header avec Navigation */}
+        <div className="mb-8 mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-zinc-900">Portfolio Overview</h1>
             <p className="text-sm text-zinc-500 mt-1">
               Operational KPIs · <span className="font-medium text-zinc-700">{mk.units_count} Units</span> · {mk.tenants_count} Active Tenants
             </p>
           </div>
-          <div className="text-right hidden sm:block">
-            <div className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Total Annual Rent</div>
-            <div className="text-3xl font-bold text-zinc-900 tabular-nums">{fmtEUR(Number(m.net_rent_year))}</div>
+
+          {/* Navigation Switcher (Overview vs Receivables) */}
+          <div className="flex items-center gap-4">
+             {/* Total Rent (Visible Desktop) */}
+             <div className="text-right hidden lg:block mr-4 border-r border-zinc-200 pr-6">
+                <div className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Total Annual Rent</div>
+                <div className="text-2xl font-bold text-zinc-900 tabular-nums">{fmtEUR(Number(m.net_rent_year))}</div>
+             </div>
+
+             {/* Toggle Switch */}
+             <div className="flex items-center gap-1 bg-zinc-200/50 p-1 rounded-xl border border-zinc-200">
+               <div className="flex items-center gap-2 px-4 py-1.5 bg-white shadow-sm rounded-lg border border-zinc-200/50 cursor-default">
+                 <LayoutDashboard size={14} className="text-zinc-900" />
+                 <span className="text-sm font-semibold text-zinc-900">Overview</span>
+               </div>
+               <Link 
+                 href="/receivables" 
+                 className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium text-zinc-500 hover:text-zinc-900 hover:bg-white/50 transition-all"
+               >
+                 <FileText size={14} />
+                 Receivables
+               </Link>
+             </div>
           </div>
         </div>
 
